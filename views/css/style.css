@@ -42,12 +42,16 @@
 }
 
 .navbar{
-    border-bottom: 1rem solid #00a8a5;
+    border-bottom: 0.5rem solid #00a8a5;
 }
 
 .logo{
-    width: 8rem;
+    width: 10rem;
     height: auto;
+}
+
+.card .card-header{
+    background-color: #00a8a5a1;
 }
 
 .btn-mex{
