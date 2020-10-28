@@ -20,8 +20,7 @@ class MakeController{
         $path = str_replace("\\", "/", $_POST['path']);
         $chats = $this->getDataChat($path."/");
         $_SESSION['chats'] = $chats;
-        
-        
+        var_dump($chats);
     }
 
     function getDataChat($path){
