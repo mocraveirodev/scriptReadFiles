@@ -1,12 +1,11 @@
 function getDataChat(path){
-    console.log(path);
     $.ajax({
-        url: window.location.href + 'path',
+        url: 'views/functions/readChat.php',
         type: 'POST',
         dataType: 'json',
         data: path,
         success: function(result){
-            // console.log(result);
+            uploadApi(result);
         },
         error: function(xhr){
             console.log(xhr);

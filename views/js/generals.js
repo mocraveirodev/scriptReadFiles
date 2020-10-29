@@ -8,7 +8,7 @@ function fillChoose(){
 
 function fillFormChat(){
     $(".card .card-body").html(`
-        <form action="/mm/path" method="post">
+        <form action="" method="post">
             <div class="input-group mb-3">
                 <input type="text" id="path" name="path" class="form-control" placeholder="Informe o Caminho da pasta:" aria-label="Informe o Caminho da pasta:" aria-describedby="btnChat">
                 <div class="input-group-append">

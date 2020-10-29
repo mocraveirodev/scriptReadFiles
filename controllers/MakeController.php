@@ -6,36 +6,30 @@ class MakeController{
             case "home":
                 $this->viewHome();
             break;
-            case "path":
-                $this->viewPath();
-            break;
         }
     }
 
     private function viewHome(){
         include "views/home.php";
     }
-
-    private function viewPath(){
-        $path = str_replace("\\", "/", $_POST['path']);
-        $chats = $this->getDataChat($path."/");
-        $_SESSION['chats'] = $chats;
-        var_dump($chats);
-    }
-
-    function getDataChat($path){
-        $diretorio = dir($path);
-        $chats = [];
-        $cont = 0;
-
-        while($arquivo = $diretorio -> read()){
-            if(strlen($arquivo) > 3){
-                $cont++;
-                $chat = file_get_contents($path.$arquivo);
-                array_push($chats,$chat);
-            }
-        }
-
-        return $chats;
-    }
 }
+
+
+
+
+
+// recordings/recording/Data_hora	ClientCaptureDate
+// recordings/recording/Id_do_chat	ClientID
+// recordings/recording/Nome_do_Audio	AudioFileLocation
+// recordings/recording/NOME_DO_AGENTE	Agent
+// recordings/recording/USUARIO	UDF_text_01
+// recordings/recording/ID_do_cliente	ANI
+// recordings/recording/STATUS	ExitStatus
+// recordings/recording/CAMPANHA	Dept
+// recordings/recording/NOME_CLIENTE	UDF_text_02
+// recordings/recording/TRANSFERIDA_PARA	TransferTo
+// recordings/recording/TRANSFERIDO_DE	TransferFrom
+// recordings/recording/GRUPO_DO_USUARIO	ContentGroup
+// recordings/recording/TEMPO_EM_FILA	WaitTimeSeconds
+// recordings/recording/GRUPO_DE_AGENTES	AgentGroup
+// recordings/recording/ID_Agente	UDF_text_03
