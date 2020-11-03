@@ -33,21 +33,24 @@
                     <h5 class="text-white text-center font-weight-bold">Madeira Madeira</h5>
                 </div>
                 <div class="card-body">
-                    
+                    <?php if($_SESSION['page'] == 'home'): ?>
+                        <h5 class="mb-4">Informe o tipo de Ingestão: </h5>
+                        <a href="/mm/?audio" class="btn btn-mex">Áudio</a>
+                        <a href="/mm/?data" class="btn btn-mex">Chat</a>
+                    <?php
+                        else:
+                            include "views/includes/" . $_SESSION['folder'] . "/" . $_SESSION['page'] . ".php";
+                        endif;
+
+                        unset($_SESSION['page']);
+                    ?>
                 </div>
             </div>
         </div>
     </main>
-    <!-- JQUERY -->
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-
-    <!-- SCRIPTS BOOTSTRAP -->
-    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     
-    <!-- SCRIPTS PERSONALIZADOS -->
-    <script src="views/js/events.js"></script>
-    <script src="views/js/requests.js"></script>
-    <script src="views/js/generals.js"></script>
+    <!-- SCRIPTS BOOTSTRAP -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 </body>
 </html>

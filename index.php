@@ -3,8 +3,33 @@
 
     switch($rotas){
         case "home":
-            include "controllers/MakeController.php";
-            $controller = new MakeController();
+            include "controllers/HomeController.php";
+            $controller = new HomeController();
+            $controller->acao($rotas);
+        break;
+        case "audio":
+            include "controllers/AudioController.php";
+            $controller = new AudioController();
+            $controller->acao($rotas);
+        break;
+        case "data":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
+            $controller->acao($rotas);
+        break;
+        case "meta":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
+            $controller->acao($rotas);
+        break;
+        case "chat":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
+            $controller->acao($rotas);
+        break;
+        case "path":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
             $controller->acao($rotas);
         break;
     }

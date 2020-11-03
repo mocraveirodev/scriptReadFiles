@@ -1,16 +1,24 @@
 <?php
 
-class MakeController{
+session_start();
+
+class AudioController{
     public function acao($rotas){
         switch($rotas){
-            case "home":
-                $this->viewHome();
+            case "audio":
+                $this->viewAudio();
             break;
         }
     }
 
-    private function viewHome(){
-        include "views/home.php";
+    private function viewAudio(){
+        $_SESSION['folder'] = 'audio';
+        $_SESSION['page'] = 'audio';
+        $this->viewLayout();
+    }
+
+    private function viewLayout(){
+        include "views/layout.php";
     }
 }
 
