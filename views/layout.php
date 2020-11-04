@@ -37,11 +37,13 @@
                         <h5 class="mb-4">Informe o tipo de Ingestão: </h5>
                         <a href="/mm/?audio" class="btn btn-mex">Áudio</a>
                         <a href="/mm/?data" class="btn btn-mex">Chat</a>
+                        <?php unset($_SESSION); ?>
                     <?php
                         else:
                             include "views/includes/" . $_SESSION['folder'] . "/" . $_SESSION['page'] . ".php";
                         endif;
 
+                        unset($_SESSION['folder']);
                         unset($_SESSION['page']);
                     ?>
                 </div>

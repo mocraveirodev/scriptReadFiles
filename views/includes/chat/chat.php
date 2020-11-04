@@ -1,8 +1,9 @@
 <form action="/mm/?path" method="post" enctype="multipart/form-data">
-    <div class="input-group mb-3">
-        <input type="text" id="path" name="path" class="form-control" placeholder="Informe o caminho da pasta:" aria-label="Informe o Caminho da pasta:" aria-describedby="btnChat">
-        <div class="input-group-append">
-            <button type="submit" class="btn btn-outline-secondary" id="btnChat">Ver Conteúdo</button>
-        </div>
+    <div class="form-group">
+        <label for="path">Informe o caminho da pasta onde estão os Chats:</label>
+        <input type="text" id="path" name="path" class="form-control" placeholder="Ex.: C:\Program Files" aria-label="Informe o Caminho da pasta:">
     </div>
+
+    <a href="/mm" class="btn btn-secondary">Voltar</a>
+    <button type="submit" class="btn btn-mex">Próximo</button>
 </form>

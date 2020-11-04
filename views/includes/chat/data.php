@@ -8,6 +8,6 @@
         <input type="text" class="form-control" id="file-meta" name="file-meta" placeholder="Ex.: Metadados Callminer.xlsx">
     </div>
     
-    <a href="/mm" type="submit" class="btn btn-secondary">Voltar</a>
+    <a href="/mm" class="btn btn-secondary">Voltar</a>
     <button type="submit" class="btn btn-mex">Próximo</button>
 </form>

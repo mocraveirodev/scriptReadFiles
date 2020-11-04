@@ -32,5 +32,15 @@
             $controller = new ChatController();
             $controller->acao($rotas);
         break;
+        case "token":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
+            $controller->acao($rotas);
+        break;
+        case "api":
+            include "controllers/ChatController.php";
+            $controller = new ChatController();
+            $controller->acao($rotas);
+        break;
     }
 ?>

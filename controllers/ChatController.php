@@ -27,6 +27,12 @@ class ChatController{
             case "path":
                 $this->readChat();
             break;
+            case "token":
+                $this->viewToken();
+            break;
+            case "api":
+                $this->uploadAPI();
+            break;
         }
     }
 
@@ -43,6 +49,24 @@ class ChatController{
     private function viewChat(){
         $_SESSION['folder'] = 'chat';
         $_SESSION['page'] = 'chat';
+        $this->viewLayout();
+    }
+
+    private function viewMeta(){
+        $_SESSION['folder'] = 'chat';
+        $_SESSION['page'] = 'meta';
+        $this->viewLayout();
+    }
+    
+    private function viewToken(){
+        $_SESSION['folder'] = 'chat';
+        $_SESSION['page'] = 'token';
+        $this->viewLayout();
+    }
+
+    private function viewAPI(){
+        $_SESSION['folder'] = 'chat';
+        $_SESSION['page'] = 'api';
         $this->viewLayout();
     }
     
@@ -98,22 +122,19 @@ class ChatController{
     private function readChat(){
         $path = $_POST['path'] . "/";
         $diretorio = dir($path);
-        $cont = 1;
+        $chats = [];
 
         while($arquivo = $diretorio -> read()){
             if(strlen($arquivo) > 3){
                 if(array_key_exists($arquivo, $_SESSION['metadata'])){
-                    $file = file($path.$arquivo);
                     $metadata = $_SESSION['metadata'][$arquivo];
-                    $data = date('Y-m-d H:i:s', strtotime(before(" <i>", $file[15])));
-                    $dataISO = date(DateTime::ISO8601, strtotime($data));
-                    echo $data . "<br>";
+                    $file = $this->getChatData(file_get_contents($path.$arquivo));
 
                     $metadata = "{
     \"Metadata\": [
         {
             \"Key\": \"ClientCaptureDate\",
-            \"Value\": \"$data\"
+            \"Value\": \"{$file['data']}\"
         },
         {
             \"Key\": \"ClientID\",
@@ -173,17 +194,116 @@ class ChatController{
         }
     ],
     \"MediaType\": \"Chat\",
-    \"ClientCaptureDate\": \"{$dataISO}\",
-    \"SourceId\": \"mex-madeiramadeira\",
+    \"ClientCaptureDate\": \"{$file['dataISO']}\",
+    \"SourceId\": \"Five9\",
     \"CorrelationId\": \"{$metadata['ClientID']}\",
-    \"Transcript\": [";
+    \"Transcript\": [".$file['text'];
+                    array_push($chats, $metadata);
                 }
-
-                $cont++;
             }
         }
 
         $diretorio -> close();
+
+        $_SESSION['chats'] = $chats;
+        
+        $this->viewMeta();
+    }
+
+    private function getChatData($chat){
+        $client = trim(between('<b>Omni.name:</b> ', '<br/>', $chat));
+        $chat = str_replace(after_last('<br/>', $chat), '', $chat);
+        $chat = str_replace(before('<b>Omni.question:</b> Olá.<br/>', $chat), '', $chat);
+        $chat = str_replace("<b>Omni.question:</b> Olá.<br/>\r\n<br/>\r\n", '', $chat);
+        $chat = substr($chat, 0, (strripos($chat, '<br/>') - strlen($chat)));
+        $data = date('Y-m-d H:i:s', strtotime(before(' <i>', $chat)));        
+        $dataISO = date(DateTime::ISO8601, strtotime($data));
+        $chat = explode("<br/>\r\n", $chat);
+        $text = '';
+
+        foreach ($chat as $key => $value) {
+            $speaker = trim(between("<i>", ":</i>", $value));
+            $texto = trim(after_last("</i>", $value));
+            $dataChat = date('Y-m-d H:i:s', strtotime(before(' <i>', $value)));        
+            $dataChatISO = date(DateTime::ISO8601, strtotime($data));
+            if($client == $speaker){
+                $text .="
+        {
+            \"Speaker\": 2,
+            \"Text\": \"$texto\",
+            \"PostDateTime\": \"$dataChatISO\",
+            \"TextInformation\": \"$speaker\"
+        },";
+            }else{
+                $text .="
+        {
+            \"Speaker\": 1,
+            \"Text\": \"$texto\",
+            \"PostDateTime\": \"$dataChatISO\",
+            \"TextInformation\": \"$speaker\"
+        },";
+            }
+        }
+
+        $text = before_last(",", $text);
+        $endData = "
+    ]
+}";
+        $text .= $endData;
+
+        return ['data' => $data, 'dataISO' => $dataISO, 'text' => $text];
+    }
+    private function uploadAPI(){
+        $erro = [];
+        $resultado = [];
+
+        foreach($_SESSION['chats'] as $string){
+            $resposta = $this->callAPI($_POST['token'], $string);
+
+            if(is_null($resposta)){
+                array_push($erro, $string);
+            }else{
+                array_push($resultado, ['resposta'=>$resposta, "metadata"=>$string]);
+            }
+        }
+
+        if($erro){
+            foreach($erro as $string){
+                $resposta = $this->callAPI($_POST['token'], $string);
+                array_shift($erro);
+    
+                if(is_null($resposta)){
+                    array_push($erro, $string);
+                }else{
+                    array_push($resultado, ['resposta'=>$resposta, "metadata"=>$string]);
+                }
+            }
+        }
+
+        $_SESSION['erro'] = $erro;
+        $_SESSION['resultado'] = $resultado;
+
+        $this->viewAPI();
+    }
+
+    private function callAPI($token, $string){
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'POST',                    
+                'header' => "Authorization: JWT $token\r\n"."Content-type: application/json; charset=utf-8\r\n",
+                'content' => $string                            
+            )
+        ));
+
+        $contents = @file_get_contents("https://ingestion.callminer.net/api/transcript", null, $context);
+
+        if(strpos($http_response_header[0], "200")) { 
+            $resposta = json_decode($contents, true);
+            
+            return $resposta;
+        } else { 
+            return null;
+        }
     }
 }
 

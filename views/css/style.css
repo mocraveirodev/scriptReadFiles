@@ -66,3 +66,7 @@
     box-shadow: 0 0 0 .2rem rgba(0, 168, 165,.3);
     border-color: #00a8a5;
 }
+
+textarea {
+    resize: none;
+}
