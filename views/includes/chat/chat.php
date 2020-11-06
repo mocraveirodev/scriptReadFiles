@@ -4,6 +4,6 @@
         <input type="text" id="path" name="path" class="form-control" placeholder="Ex.: C:\Program Files" aria-label="Informe o Caminho da pasta:">
     </div>
 
-    <a href="/mm" class="btn btn-secondary">Voltar</a>
+    <a href="/mm" class="btn btn-secondary">Página Inicial</a>
     <button type="submit" class="btn btn-mex">Próximo</button>
 </form>

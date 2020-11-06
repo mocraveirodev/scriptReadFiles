@@ -80,7 +80,7 @@ class ChatController{
 
         $linhas = [];
 
-        foreach ($sheet->getRowIterator(8) as $row) {
+        foreach ($sheet->getRowIterator(6) as $row) {
             $cellInterator = $row->getCellIterator();
             $cellInterator->setIterateOnlyExistingCells(false);
             $linha = [];
@@ -127,7 +127,7 @@ class ChatController{
         while($arquivo = $diretorio -> read()){
             if(strlen($arquivo) > 3){
                 if(array_key_exists($arquivo, $_SESSION['metadata'])){
-                    $metadata = $_SESSION['metadata'][$arquivo];
+                    $data = $_SESSION['metadata'][$arquivo];
                     $file = $this->getChatData(file_get_contents($path.$arquivo));
 
                     $metadata = "{
@@ -138,7 +138,7 @@ class ChatController{
         },
         {
             \"Key\": \"ClientID\",
-            \"Value\": \"{$metadata['ClientID']}\"
+            \"Value\": \"{$data['ClientID']}\"
         },
         {
             \"Key\": \"AudioFileLocation\",
@@ -146,59 +146,60 @@ class ChatController{
         },
         {
             \"Key\": \"Agent\",
-            \"Value\": \"{$metadata['Agent']}\"
+            \"Value\": \"{$data['Agent']}\"
         },
         {
             \"Key\": \"UDF_text_01\",
-            \"Value\": \"{$metadata['UDF_text_01']}\"
+            \"Value\": \"{$data['UDF_text_01']}\"
         },
         {
             \"Key\": \"ANI\",
-            \"Value\": \"{$metadata['ANI']}\"
+            \"Value\": \"{$data['ANI']}\"
         },
         {
             \"Key\": \"ExitStatus\",
-            \"Value\": \"{$metadata['ExitStatus']}\"
+            \"Value\": \"{$data['ExitStatus']}\"
         },
         {
             \"Key\": \"Dept\",
-            \"Value\": \"{$metadata['Dept']}\"
+            \"Value\": \"{$data['Dept']}\"
         },
         {
             \"Key\": \"UDF_text_02\",
-            \"Value\": \"{$metadata['UDF_text_02']}\"
+            \"Value\": \"{$data['UDF_text_02']}\"
         },
         {
             \"Key\": \"TransferTo\",
-            \"Value\": \"{$metadata['TransferTo']}\"
+            \"Value\": \"{$data['TransferTo']}\"
         },
         {
             \"Key\": \"TransferFrom\",
-            \"Value\": \"{$metadata['TransferFrom']}\"
+            \"Value\": \"{$data['TransferFrom']}\"
         },
         {
             \"Key\": \"ContentGroup\",
-            \"Value\": \"{$metadata['ContentGroup']}\"
+            \"Value\": \"{$data['ContentGroup']}\"
         },
         {
             \"Key\": \"WaitTimeSeconds\",
-            \"Value\": \"{$metadata['WaitTimeSeconds']}\"
+            \"Value\": \"{$data['WaitTimeSeconds']}\"
         },
         {
             \"Key\": \"AgentGroup\",
-            \"Value\": \"{$metadata['AgentGroup']}\"
+            \"Value\": \"{$data['AgentGroup']}\"
         },
         {
             \"Key\": \"UDF_text_03\",
-            \"Value\": \"{$metadata['UDF_text_03']}\"
+            \"Value\": \"{$data['UDF_text_03']}\"
         }
     ],
     \"MediaType\": \"Chat\",
     \"ClientCaptureDate\": \"{$file['dataISO']}\",
     \"SourceId\": \"Five9\",
-    \"CorrelationId\": \"{$metadata['ClientID']}\",
+    \"CorrelationId\": \"{$data['ClientID']}\",
     \"Transcript\": [".$file['text'];
-                    array_push($chats, $metadata);
+
+                    $chats[$data['ClientID']] = $metadata;
                 }
             }
         }
@@ -223,7 +224,7 @@ class ChatController{
 
         foreach ($chat as $key => $value) {
             $speaker = trim(between("<i>", ":</i>", $value));
-            $texto = trim(after_last("</i>", $value));
+            $texto = str_replace("\"","'", trim(after_last("</i>", $value)));
             $dataChat = date('Y-m-d H:i:s', strtotime(before(' <i>', $value)));        
             $dataChatISO = date(DateTime::ISO8601, strtotime($data));
             if($client == $speaker){
@@ -257,25 +258,26 @@ class ChatController{
         $erro = [];
         $resultado = [];
 
-        foreach($_SESSION['chats'] as $string){
+        foreach($_SESSION['chats'] as $id => $string){
+            $_SESSION['token'] = $_POST['token'];
             $resposta = $this->callAPI($_POST['token'], $string);
 
             if(is_null($resposta)){
-                array_push($erro, $string);
+                $erro[$id] = $string;
             }else{
-                array_push($resultado, ['resposta'=>$resposta, "metadata"=>$string]);
+                $resultado[$id] = $resposta;
             }
         }
 
         if($erro){
-            foreach($erro as $string){
+            foreach($erro as $id => $string){
                 $resposta = $this->callAPI($_POST['token'], $string);
                 array_shift($erro);
     
                 if(is_null($resposta)){
-                    array_push($erro, $string);
+                    $erro[$id] = $string;
                 }else{
-                    array_push($resultado, ['resposta'=>$resposta, "metadata"=>$string]);
+                    $resultado[$id] = $resposta;
                 }
             }
         }
@@ -306,23 +308,3 @@ class ChatController{
         }
     }
 }
-
-
-
-
-
-// recordings/recording/Data_hora	ClientCaptureDate
-// recordings/recording/Id_do_chat	ClientID
-// recordings/recording/Nome_do_Audio	AudioFileLocation
-// recordings/recording/NOME_DO_AGENTE	Agent
-// recordings/recording/USUARIO	UDF_text_01
-// recordings/recording/ID_do_cliente	ANI
-// recordings/recording/STATUS	ExitStatus
-// recordings/recording/CAMPANHA	Dept
-// recordings/recording/NOME_CLIENTE	UDF_text_02
-// recordings/recording/TRANSFERIDA_PARA	TransferTo
-// recordings/recording/TRANSFERIDO_DE	TransferFrom
-// recordings/recording/GRUPO_DO_USUARIO	ContentGroup
-// recordings/recording/TEMPO_EM_FILA	WaitTimeSeconds
-// recordings/recording/GRUPO_DE_AGENTES	AgentGroup
-// recordings/recording/ID_Agente	UDF_text_03
