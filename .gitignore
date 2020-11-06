@@ -5,4 +5,4 @@
 /vendor
 composer.json
 composer.lock
-package-lock2.json
+package-lock.json
