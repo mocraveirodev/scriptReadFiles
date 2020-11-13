@@ -2,6 +2,8 @@
 
 session_start();
 
+set_time_limit(100000);
+
 require 'vendor/autoload.php';
 
 include_once('views/includes/substrfunctions.php');
@@ -73,6 +75,7 @@ class ChatController{
     private function readMeta(){
         $path = $_POST['path-meta'] . "/";
         $file = $_POST['file-meta'];
+        $title = $_POST['file-title'] + 1;
 
         $reader = IOFactory::createReader("Xlsx");
         $spreadsheet = $reader->load($path.$file);
@@ -80,7 +83,7 @@ class ChatController{
 
         $linhas = [];
 
-        foreach ($sheet->getRowIterator(6) as $row) {
+        foreach ($sheet->getRowIterator($title) as $row) {
             $cellInterator = $row->getCellIterator();
             $cellInterator->setIterateOnlyExistingCells(false);
             $linha = [];
@@ -110,10 +113,11 @@ class ChatController{
                 'ContentGroup' => $linha[13],
                 'WaitTimeSeconds' => $linha[14],
                 'AgentGroup' => $linha[19],
-                'UDF_text_03' => $linha[20]
+                'UDF_text_03' => $linha[20],
+                'UDF_text_04' => $linha[6]
             ];
         }
-
+        
         $_SESSION['metadata'] = $linhas;
         
         echo "<script>window.location.href = '/mm/?chat';</script>";
@@ -129,6 +133,9 @@ class ChatController{
                 if(array_key_exists($arquivo, $_SESSION['metadata'])){
                     $data = $_SESSION['metadata'][$arquivo];
                     $file = $this->getChatData(file_get_contents($path.$arquivo));
+                    
+        var_dump($file);
+        // die;
 
                     $metadata = "{
     \"Metadata\": [
@@ -191,6 +198,10 @@ class ChatController{
         {
             \"Key\": \"UDF_text_03\",
             \"Value\": \"{$data['UDF_text_03']}\"
+        },
+        {
+            \"Key\": \"UDF_text_04\",
+            \"Value\": \"{$data['UDF_text_04']}\"
         }
     ],
     \"MediaType\": \"Chat\",
@@ -221,7 +232,7 @@ class ChatController{
         $dataISO = date(DateTime::ISO8601, strtotime($data));
         $chat = explode("<br/>\r\n", $chat);
         $text = '';
-
+        
         foreach ($chat as $key => $value) {
             $speaker = trim(between("<i>", ":</i>", $value));
             $texto = str_replace("\"","'", trim(after_last("</i>", $value)));
@@ -254,6 +265,7 @@ class ChatController{
 
         return ['data' => $data, 'dataISO' => $dataISO, 'text' => $text];
     }
+
     private function uploadAPI(){
         $erro = [];
         $resultado = [];
@@ -269,18 +281,18 @@ class ChatController{
             }
         }
 
-        if($erro){
-            foreach($erro as $id => $string){
-                $resposta = $this->callAPI($_POST['token'], $string);
-                array_shift($erro);
+        // if($erro){
+        //     foreach($erro as $id => $string){
+        //         $resposta = $this->callAPI($_POST['token'], $string);
+        //         array_shift($erro);
     
-                if(is_null($resposta)){
-                    $erro[$id] = $string;
-                }else{
-                    $resultado[$id] = $resposta;
-                }
-            }
-        }
+        //         if(is_null($resposta)){
+        //             $erro[$id] = $string;
+        //         }else{
+        //             $resultado[$id] = $resposta;
+        //         }
+        //     }
+        // }
 
         $_SESSION['erro'] = $erro;
         $_SESSION['resultado'] = $resultado;

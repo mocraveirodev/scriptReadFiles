@@ -2,6 +2,8 @@
 
 session_start();
 
+set_time_limit(100000);
+
 class HomeController{
     public function acao($rotas){
         switch($rotas){
