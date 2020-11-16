@@ -133,9 +133,6 @@ class ChatController{
                 if(array_key_exists($arquivo, $_SESSION['metadata'])){
                     $data = $_SESSION['metadata'][$arquivo];
                     $file = $this->getChatData(file_get_contents($path.$arquivo));
-                    
-        var_dump($file);
-        // die;
 
                     $metadata = "{
     \"Metadata\": [
@@ -237,7 +234,8 @@ class ChatController{
             $speaker = trim(between("<i>", ":</i>", $value));
             $texto = str_replace("\"","'", trim(after_last("</i>", $value)));
             $dataChat = date('Y-m-d H:i:s', strtotime(before(' <i>', $value)));        
-            $dataChatISO = date(DateTime::ISO8601, strtotime($data));
+            $dataChatISO = date(DateTime::ISO8601, strtotime($dataChat));
+
             if($client == $speaker){
                 $text .="
         {
@@ -258,6 +256,7 @@ class ChatController{
         }
 
         $text = before_last(",", $text);
+
         $endData = "
     ]
 }";
