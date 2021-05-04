@@ -101,7 +101,8 @@ class ChatController{
             }
 
             $linhas[$linha[7] . ".html"] = [
-                'Agent' => $linha[4],
+				'Agent' => $linha[4],
+				'ClientCaptureDate' => $linha[3],
                 'ClientID' => $linha[7],
                 'UDF_text_01' => $linha[5],
                 'ANI' => $linha[0],
@@ -114,7 +115,11 @@ class ChatController{
                 'WaitTimeSeconds' => $linha[14],
                 'AgentGroup' => $linha[19],
                 'UDF_text_03' => $linha[20],
-                'UDF_text_04' => $linha[6]
+                'UDF_num_01' => $linha[6],
+				'UDF_text_05' => $linha[21],
+				'UDF_text_06' => $linha[22],
+				'UDF_text_07' => $linha[23],
+				'UDF_text_08' => $linha[24]
             ];
         }
         
@@ -138,7 +143,7 @@ class ChatController{
     \"Metadata\": [
         {
             \"Key\": \"ClientCaptureDate\",
-            \"Value\": \"{$file['data']}\"
+            \"Value\": \"{$data['ClientCaptureDate']}}\"
         },
         {
             \"Key\": \"ClientID\",
@@ -197,12 +202,32 @@ class ChatController{
             \"Value\": \"{$data['UDF_text_03']}\"
         },
         {
-            \"Key\": \"UDF_text_04\",
-            \"Value\": \"{$data['UDF_text_04']}\"
+            \"Key\": \"UDF_num_01\",
+            \"Value\": \"{$data['UDF_num_01']}\"
+        },
+        {
+            \"Key\": \"UDF_text_05\",
+            \"Value\": \"{$data['UDF_text_05']}\"
+        },
+        {
+            \"Key\": \"UDF_text_06\",
+            \"Value\": \"{$data['UDF_text_06']}\"
+		},
+        {
+            \"Key\": \"UDF_text_07\",
+            \"Value\": \"{$data['UDF_text_07']}\"
+		},
+        {
+            \"Key\": \"UDF_text_08\",
+            \"Value\": \"{$data['UDF_text_08']}\"
+        },
+        {
+            \"Key\": \"UDF_text_10\",
+            \"Value\": \"{$file['CPF']}\"
         }
     ],
     \"MediaType\": \"Chat\",
-    \"ClientCaptureDate\": \"{$file['dataISO']}\",
+    \"ClientCaptureDate\": \"{$data['ClientCaptureDate']}\",
     \"SourceId\": \"Five9\",
     \"CorrelationId\": \"{$data['ClientID']}\",
     \"Transcript\": [".$file['text'];
@@ -220,10 +245,12 @@ class ChatController{
     }
 
     private function getChatData($chat){
-        $client = trim(between('<b>Omni.name:</b> ', '<br/>', $chat));
+        $cpf = trim(between('<b>Var_chat.ch_cpf_cnpj:</b> ', '<br/>', $chat));
+        $client0 = trim(between('<b>Omni.name:</b> ', '<br/>', $chat));
+		$client= substr($client0,0,6);
         $chat = str_replace(after_last('<br/>', $chat), '', $chat);
-        $chat = str_replace(before('<b>Omni.question:</b> Olá.<br/>', $chat), '', $chat);
-        $chat = str_replace("<b>Omni.question:</b> Olá.<br/>\r\n<br/>\r\n", '', $chat);
+        $chat = str_replace(before('<b>Omni.question:</b> Olá<br/>', $chat), '', $chat);
+        $chat = str_replace("<b>Omni.question:</b> Olá<br/>\r\n<br/>\r\n", '', $chat);
         $chat = substr($chat, 0, (strripos($chat, '<br/>') - strlen($chat)));
         $data = date('Y-m-d H:i:s', strtotime(before(' <i>', $chat)));        
         $dataISO = date(DateTime::ISO8601, strtotime($data));
@@ -231,7 +258,8 @@ class ChatController{
         $text = '';
         
         foreach ($chat as $key => $value) {
-            $speaker = trim(between("<i>", ":</i>", $value));
+            $speaker0 = trim(between("<i>", ":</i>", $value));
+			$speaker = substr($speaker0,0,6);
             $texto = str_replace("\"","'", trim(after_last("</i>", $value)));
             $dataChat = date('Y-m-d H:i:s', strtotime(before(' <i>', $value)));        
             $dataChatISO = date(DateTime::ISO8601, strtotime($dataChat));
@@ -242,7 +270,7 @@ class ChatController{
             \"Speaker\": 2,
             \"Text\": \"$texto\",
             \"PostDateTime\": \"$dataChatISO\",
-            \"TextInformation\": \"$speaker\"
+            \"TextInformation\": \"Cliente\"
         },";
             }else{
                 $text .="
@@ -250,7 +278,7 @@ class ChatController{
             \"Speaker\": 1,
             \"Text\": \"$texto\",
             \"PostDateTime\": \"$dataChatISO\",
-            \"TextInformation\": \"$speaker\"
+            \"TextInformation\": \"Agente\"
         },";
             }
         }
@@ -262,7 +290,7 @@ class ChatController{
 }";
         $text .= $endData;
 
-        return ['data' => $data, 'dataISO' => $dataISO, 'text' => $text];
+        return ['CPF' => $cpf, 'data' => $data, 'dataISO' => $dataISO, 'text' => $text];
     }
 
     private function uploadAPI(){
